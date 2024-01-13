@@ -1,0 +1,182 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;1,300;1,500&family=Sen:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/styles.css">
+
+    <title>SmartCare</title>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-container">
+        <div class="logo-container"><h1 class="logo">SmartCare</h1></div>
+        <div class="menu-container">
+          <ul class="menu-list">
+            <a href="/"<li class="list-item active">Home</li></a>
+           
+          </ul>
+        </div>
+        <div class="profile-container">
+          <img class="profile-picture" src="images/shar.png" alt="" />
+          <div class="profile-text-container">
+            <span class="profile-text">Profile</span>
+            <i class="fa-solid fa-caret-down"></i>
+          </div>
+          <div class="toggle">
+            <i class="fa-solid fa-moon toggle-icon"></i>
+            <i class="fa-solid fa-sun toggle-icon"></i>
+            <div class="toggle-ball"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar">
+        
+      </div>
+      
+          
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="content-container">
+         
+                          
+            <br>
+         <div class=""> <h1>Send the information to the APP</h1>
+          <br>
+
+
+          <form  action="/store" method="post" id="diseaseForm">
+
+            
+            <label for="pid" >Patient_ID</label>
+            <input type="text" id="pid" name="pid" required>
+            <!--  -->
+            <label for="patient_name">Patient Name</label>
+            <input type="text" id="pname" name="pname" required>
+
+            <label for="diseaseName">Disease Name:</label>
+            <input type="text" id="diseaseName" name="diseaseName" required>
+        
+              <!--  -->
+
+            <label for="infoDate">Information Date:</label>
+            <input type="date" id="infoDate" name="infoDate" required>
+              <!--  -->
+            <label for="testResult">Test Result (PDF, PNG, JPG):</label>
+            <!--  -->
+            <input type="file" id="testResult" name="testResult" accept=".pdf, .png, .jpg" required>
+            <!--  -->
+        
+            <button type="submit">Submit</button>
+        </form>
+
+
+
+
+            <div id="createPatient"></div>
+            
+          </div>
+         
+      </div>
+  </div>
+  
+  
+  <script>
+
+    if (document.querySelector("#pname").value != null)
+
+    {
+    
+    async function addPatient() {
+     
+      const pid = document.querySelector("#pid").value;
+      const pname = document.querySelector("#pname").value;
+      const diseaseName = document.querySelector("#diseaseName").value;
+      const infoDate = document.querySelector("#infoDate").value;
+      const testResult = document.querySelector("#testResult").value;
+      
+
+      
+      const response = await fetch("http://localhost:1331/store", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    pid: pid,
+    pname: pname,
+    diseaseName: diseaseName,
+    infoDate: infoDate,
+    testResult: testResult,
+    
+  }),
+});
+
+
+      document.querySelector("#pid").value = "";
+      document.querySelector("#pname").value = "";
+      document.querySelector("#diseaseName").value = "";
+      document.querySelector("#infoDate").value = "";
+      document.querySelector("#testResult").value = "";
+      
+      console.log("patient data added successfully");
+
+
+      showPatient();
+      
+      
+    }
+
+    async function showPatient() {
+  const response = await fetch("http://localhost:1331/show");
+  let patients = await response.json();
+  patients = patients.reverse();
+  document.querySelector("#createPatient").innerHTML = "";
+
+  patients.forEach((patient) => {
+    document.querySelector("#createPatient").innerHTML += `
+
+
+    <div class="patient-card">
+  <p class="patient-title"><strong>Patient Name: </strong>${patient.patient_name}</p>
+  <p class="patient-description"><strong>Patient ID:</strong> ${patient.patient_id}</p>
+  <p class="patient-release-year"><strong>Disease:</strong> ${patient.disease_name}</p>
+  <p class="patient-genre"><strong>Test Result Date:</strong> ${patient.test_result_date}</p>
+
+  <p class ="test-result">
+          <strong>Test Result:</strong>
+          <a href="${patient.test_result}" target="_blank">View Test Result</a>
+        </p>
+
+      </div>`;
+  });
+
+  console.log("patient data retrieved successfully");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    showPatient();
+  });
+}
+else {
+    console.log('you cannot submit  empty')
+}
+
+
+
+
+  </script>
+  </body>
+</html>
